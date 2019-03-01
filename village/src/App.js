@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Link, Route } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 
 import './App.css';
 import NavBar from './components/NavBar';
@@ -25,7 +25,14 @@ class App extends Component {
     axios
       .get(smurfsURL)
       .then(res => this.setSmurfs(res.data))
-      .catch(res => console.log(res.message));
+      .catch(err => console.log(err.message));
+  };
+
+  deleteData = id => {
+    axios
+      .delete(`${smurfsURL}/${id}`)
+      .then(res => this.setSmurfs(res.data))
+      .catch(err => console.log(err.message));
   };
 
   setSmurfs = smurfs => {
@@ -33,12 +40,11 @@ class App extends Component {
   };
 
   render() {
-    console.log(this.state.smurfs);
     return (
       <div className="App">
         <NavBar />
         <Route exact path="/smurf-form" render={pr => <SmurfForm {...pr} setSmurfs={this.setSmurfs} />} />
-        <Route exact path="/" render={pr => <Smurfs {...pr} smurfs={this.state.smurfs} />} />
+        <Route exact path="/" render={pr => <Smurfs {...pr} smurfs={this.state.smurfs} deleteData={this.deleteData} />} />
       </div>
     );
   }
