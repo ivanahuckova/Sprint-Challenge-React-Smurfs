@@ -1,24 +1,50 @@
 import React, { Component } from 'react';
+import axios from 'axios';
+import { Route } from 'react-router-dom';
 
 import './App.css';
+import NavBar from './components/NavBar';
 import SmurfForm from './components/SmurfForm';
 import Smurfs from './components/Smurfs';
+
+const smurfsURL = 'http://localhost:3333/smurfs';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      smurfs: [],
+      smurfs: []
     };
   }
-  // add any needed code to ensure that the smurfs collection exists on state and it has data coming from the server
-  // Notice what your map function is looping over and returning inside of Smurfs.
-  // You'll need to make sure you have the right properties on state and pass them down to props.
+
+  componentDidMount() {
+    this.fetchData();
+  }
+
+  fetchData = () => {
+    axios
+      .get(smurfsURL)
+      .then(res => this.setSmurfs(res.data))
+      .catch(err => console.log(err.message));
+  };
+
+  deleteData = id => {
+    axios
+      .delete(`${smurfsURL}/${id}`)
+      .then(res => this.setSmurfs(res.data))
+      .catch(err => console.log(err.message));
+  };
+
+  setSmurfs = smurfs => {
+    this.setState({ smurfs });
+  };
+
   render() {
     return (
       <div className="App">
-        <SmurfForm />
-        <Smurfs smurfs={this.state.smurfs} />
+        <NavBar />
+        <Route exact path="/smurf-form" render={pr => <SmurfForm {...pr} setSmurfs={this.setSmurfs} />} />
+        <Route exact path="/" render={pr => <Smurfs {...pr} smurfs={this.state.smurfs} deleteData={this.deleteData} />} />
       </div>
     );
   }
